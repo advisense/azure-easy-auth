@@ -11,7 +11,8 @@ requires = ["uv_build"]
 build-backend = "uv_build"
 
 [project.optional-dependencies]
-dev = ["pytest"]
+fastapi = ["fastapi>=0.95.0"]
+dev = ["pytest", "fastapi>=0.95.0", "httpx"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

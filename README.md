@@ -94,22 +94,36 @@ def me():
 
 ### FastAPI
 
+Install with the FastAPI extra:
+
+```bash
+pip install "git+https://github.com/advisense/azure-easy-auth.git#egg=azure-easy-auth[fastapi]"
+```
+
+Then use the built-in dependency type aliases — no boilerplate required:
+
 ```python
-from fastapi import FastAPI, Request
-from azure_easy_auth import EasyAuthUser, from_headers
+from fastapi import FastAPI
+from azure_easy_auth.fastapi import AuthenticatedUser, CurrentUser
 
 app = FastAPI()
 
-def get_user(request: Request) -> EasyAuthUser:
-    return from_headers(request.headers)
-
+# Raises HTTP 401 automatically if not authenticated
 @app.get("/me")
-def me(request: Request):
-    user = get_user(request)
-    if not user.is_authenticated:
-        raise HTTPException(status_code=401)
+def me(user: AuthenticatedUser):
     return {"name": user.name, "email": user.email, "roles": user.roles}
+
+# Works for both authenticated and anonymous users
+@app.get("/public")
+def public(user: CurrentUser):
+    greeting = f"Hello, {user.name}" if user.is_authenticated else "Hello, stranger"
+    return {"message": greeting}
 ```
+
+| Type alias | Behaviour |
+|---|---|
+| `AuthenticatedUser` | Injects `EasyAuthUser`, raises `HTTP 401` if not authenticated |
+| `CurrentUser` | Injects `EasyAuthUser`, never raises — check `.is_authenticated` yourself |
 
 ### Django
 
