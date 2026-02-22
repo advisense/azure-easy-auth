@@ -1,16 +1,20 @@
 # CLAUDE.md
 
 ## Project Overview
-[Placeholder: Brief description of the azure-easy-auth project]
+Makes it easy for python applications to get access to authenticated user info.
 
 ## Purpose
-[Placeholder: Explain the main purpose and goals of this library]
+Library that makes it easy to get authentication info on users authentiated through Azure Easy Auth, meaning applications running on Azure App Service that has the App Service authentication/authorization module enabled. Exposed methods to get authentication status, claims, from headers exposed to the application (see: https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities).
 
 ## Key Features
-[Placeholder: List the main features of the library]
-- Feature 1
-- Feature 2
-- Feature 3
+- [Placeholder: Feature 1]
+- [Placeholder: Feature 2]
+- [Placeholder: Feature 3]
+
+## Tech Stack
+- Python
+- uv and uv_build for dependencies and build
+- pytest for tests
 
 ## Architecture
 [Placeholder: Describe the overall architecture and design patterns]
