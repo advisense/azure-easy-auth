@@ -2,7 +2,7 @@
 
 Simple library to enable the "Easy" in Azure Easy Authentication.
 
-Parses the headers injected by [Azure App Service authentication](https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities) into a clean Python object — no external dependencies required.
+Parses the headers injected by [Azure App Service authentication](https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-user-identities) into a clean Python object — no external dependencies required. Optionally fetch additional user details (profile photo, manager, etc.) from the Microsoft Graph API.
 
 ## Requirements
 
@@ -19,6 +19,13 @@ Or with `uv`:
 
 ```bash
 uv add git+https://github.com/advisense/azure-easy-auth.git
+```
+
+Optional extras:
+
+```bash
+pip install "azure-easy-auth[fastapi]"   # FastAPI dependency injection
+pip install "azure-easy-auth[graph]"     # Microsoft Graph API integration
 ```
 
 ## How it works
@@ -125,6 +132,36 @@ def public(user: CurrentUser):
 | `AuthenticatedUser` | Injects `EasyAuthUser`, raises `HTTP 401` if not authenticated |
 | `CurrentUser` | Injects `EasyAuthUser`, never raises — check `.is_authenticated` yourself |
 
+### Microsoft Graph (profile, photo, manager)
+
+Install with the Graph extra:
+
+```bash
+pip install "git+https://github.com/advisense/azure-easy-auth.git#egg=azure-easy-auth[graph]"
+```
+
+This adds `httpx` and unlocks the `azure_easy_auth.graph` module, which uses the `X-MS-TOKEN-AAD-ACCESS-TOKEN` header that Easy Auth injects when the [token store](https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-oauth-tokens) is enabled.
+
+```python
+from azure_easy_auth import from_headers
+from azure_easy_auth.graph import get_access_token, fetch_profile, fetch_photo, fetch_manager
+
+user = from_headers(request.headers)
+token = get_access_token(request.headers)
+
+if token:
+    profile = fetch_profile(token)
+    print(profile.display_name)   # "Jane Doe"
+    print(profile.job_title)      # "Engineer"
+    print(profile.department)     # "Platform"
+    print(profile.company_name)   # "Contoso"
+
+    photo = fetch_photo(token)    # bytes (JPEG) or None
+    manager = fetch_manager(token)  # GraphProfile or None
+```
+
+> **Note:** The access token header requires `isTokenStoreEnabled: true` in your App Service auth settings (`authsettingsV2`).
+
 ### Django
 
 ```python
@@ -166,6 +203,44 @@ Returns `True` if Easy Auth headers are present. Shorthand for `from_headers(hea
 ### `Claim`
 
 A simple frozen dataclass with two fields: `typ` (claim type) and `val` (claim value).
+
+### `azure_easy_auth.graph`
+
+Requires the `graph` extra (`pip install azure-easy-auth[graph]`).
+
+#### `get_access_token(headers) -> str | None`
+
+Extracts the AAD access token from Easy Auth headers. Returns `None` if the header is not present.
+
+#### `fetch_profile(token) -> GraphProfile`
+
+Fetches the authenticated user's profile from the Microsoft Graph `/me` endpoint. Raises `httpx.HTTPStatusError` on failure.
+
+#### `fetch_photo(token) -> bytes | None`
+
+Fetches the user's profile photo as JPEG bytes. Returns `None` if no photo is set.
+
+#### `fetch_manager(token) -> GraphProfile | None`
+
+Fetches the user's manager profile. Returns `None` if no manager is assigned.
+
+#### `GraphProfile`
+
+| Attribute | Type | Description |
+|---|---|---|
+| `id` | `str \| None` | Azure AD object ID |
+| `display_name` | `str \| None` | Full display name |
+| `given_name` | `str \| None` | First name |
+| `surname` | `str \| None` | Last name |
+| `email` | `str \| None` | Primary email address (`mail` field) |
+| `user_principal_name` | `str \| None` | UPN (typically `user@domain`) |
+| `job_title` | `str \| None` | Job title |
+| `department` | `str \| None` | Department |
+| `office_location` | `str \| None` | Office location |
+| `company_name` | `str \| None` | Company name |
+| `mobile_phone` | `str \| None` | Mobile phone number |
+| `business_phones` | `list[str]` | Business phone numbers |
+| `raw` | `dict` | Full raw JSON response for unmapped fields |
 
 ## Local development
 

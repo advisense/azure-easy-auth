@@ -1,6 +1,6 @@
 [project]
 name = "azure-easy-auth"
-version = "0.1.0"
+version = "0.2.0"
 description = "Simple library to enable the 'Easy' in Azure Easy Authentication"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -12,7 +12,8 @@ build-backend = "uv_build"
 
 [project.optional-dependencies]
 fastapi = ["fastapi>=0.95.0"]
-dev = ["pytest", "fastapi>=0.95.0", "httpx"]
+graph = ["httpx>=0.24.0"]
+dev = ["pytest", "fastapi>=0.95.0", "httpx>=0.24.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

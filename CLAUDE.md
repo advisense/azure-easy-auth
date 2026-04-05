@@ -11,7 +11,8 @@ Applications running on Azure App Service with the authentication module enabled
 - Convenience properties for common identity fields: `email`, `object_id`, `roles`, `groups`
 - Arbitrary claim lookup via `get_claim()` / `get_claims()`
 - Case-insensitive header handling — works with Flask, FastAPI, Django out of the box
-- Zero external dependencies (stdlib only)
+- Zero external dependencies for core (stdlib only)
+- Opt-in Microsoft Graph integration for profile photo, user details, and manager info
 
 ## Tech Stack
 - Python 3.9+
@@ -22,10 +23,12 @@ Applications running on Azure App Service with the authentication module enabled
 ## Architecture
 Single-module library under `src/azure_easy_auth/`:
 
-- `_auth.py` — all implementation: `_decode_principal()`, `EasyAuthUser` dataclass, `from_headers()`, `is_authenticated()`
+- `_auth.py` — core implementation: `_decode_principal()`, `EasyAuthUser` dataclass, `from_headers()`, `is_authenticated()`
 - `__init__.py` — re-exports the public API: `Claim`, `EasyAuthUser`, `from_headers`, `is_authenticated`
+- `graph.py` — opt-in Microsoft Graph integration (requires `httpx`): `GraphProfile`, `get_access_token()`, `fetch_profile()`, `fetch_photo()`, `fetch_manager()`
+- `fastapi.py` — FastAPI dependencies: `CurrentUser`, `AuthenticatedUser`
 
-No framework integration code is included; the library accepts any `Mapping[str, str]`, so it works with any framework's headers object.
+The core library has zero external dependencies. Optional extras (`graph`, `fastapi`) add framework-specific integrations.
 
 ## Development
 
