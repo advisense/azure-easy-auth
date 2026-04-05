@@ -40,7 +40,7 @@ wheels = [
 
 [[package]]
 name = "azure-easy-auth"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -55,15 +55,19 @@ fastapi = [
     { name = "fastapi", version = "0.128.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "fastapi", version = "0.131.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
 ]
+graph = [
+    { name = "httpx" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi", marker = "extra == 'dev'", specifier = ">=0.95.0" },
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.95.0" },
-    { name = "httpx", marker = "extra == 'dev'" },
+    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.24.0" },
+    { name = "httpx", marker = "extra == 'graph'", specifier = ">=0.24.0" },
     { name = "pytest", marker = "extra == 'dev'" },
 ]
-provides-extras = ["fastapi", "dev"]
+provides-extras = ["fastapi", "graph", "dev"]
 
 [[package]]
 name = "certifi"
