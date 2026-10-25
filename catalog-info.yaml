@@ -5,6 +5,6 @@ metadata:
   name: azure-easy-auth
   description: "Simple library to enable the \"Easy\" in Azure Easy Authentication."
 spec:
-  type: demo  # service | website | library | tool | demo
+  type: library  # service | website | library | tool | demo
   lifecycle: experimental  # experimental (demo/PoC) | production | deprecated
   owner: cdr  # owning team or business unit, lowercase
